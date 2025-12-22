@@ -4,7 +4,7 @@
     <v-card class="pa-4" outlined>
       <v-card-title>Update Product</v-card-title>
       <v-card-text>
-        <ProductForm @submit-form="updateProduct" :data="form" :loading="loading" />
+        <ProductForm :showDelete="true" @submit-form="updateProduct" @onDelete="deleteProduct" :data="form" :loading="loading" />
       </v-card-text>
     </v-card>
   </v-container>
@@ -38,13 +38,29 @@ export default defineComponent({
   methods: {
     async fetchProduct() {
       try {
+        this.loading = true
         const res = await api.get(`/products/${this.productId}`)
         console.log(res)
         this.form = res.data
       } catch (err) {
         console.error(err)
       } finally {
+        this.loading = false
+      }
+    },
+    async deleteProduct() {
+      console.log('deleting')
+      if (!confirm('Delete Product?')) return
 
+      try {
+        this.loading = true
+        const res = await api.delete(`/products/${this.productId}`)
+        console.log(res)
+        this.$router.push(`/products/showall`)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        this.loading = false
       }
     },
     async updateProduct(data) {
@@ -52,7 +68,7 @@ export default defineComponent({
         this.loading = true
         const res = await api.patch(`/products/${this.productId}`, data)
         this.fetchProduct()
-      
+
         this.queue = []
         this.queue.push({
           text: 'Updated Successfully!',

@@ -13,6 +13,9 @@
       <v-divider></v-divider>
 
       <v-card-actions>
+        <v-btn v-if='showDelete' type='button' @click="onDelete" :loading="loading" :disabled="loading" color="red">
+          <v-icon icon="mdi-trash-can" end></v-icon>
+        </v-btn>
         <v-spacer></v-spacer>
         <v-btn type='submit' :loading="loading" :disabled="loading" color="success">
           Confirm
@@ -31,6 +34,10 @@ import { VForm } from 'vuetify/components';
 export default defineComponent({
   props: {
     loading: {
+      type: Boolean,
+      default: false,
+    },
+    showDelete: {
       type: Boolean,
       default: false,
     },
@@ -75,6 +82,11 @@ export default defineComponent({
       if (!valid) return
 
       this.$emit('submit-form', this.form);
+    },
+
+    onDelete() {
+      console.log('deleting')
+      this.$emit('onDelete')
     }
   }
 });

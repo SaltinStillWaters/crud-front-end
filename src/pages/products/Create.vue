@@ -4,7 +4,7 @@
         <v-card class="pa-4" outlined>
             <v-card-title>Create Product</v-card-title>
             <v-card-text>
-                <CreateProductForm @submit-form="createProduct" :loading="loading" />
+                <ProductForm @submit-form="createProduct" :loading="loading" />
             </v-card-text>
         </v-card>
     </v-container>
@@ -12,6 +12,7 @@
 
 <script>
 import ProductForm from '@/components/ProductForm.vue';
+import api from '@/utils/axios';
 
 export default {
     data: () => ({
@@ -33,7 +34,9 @@ export default {
                     text: 'Product added!',
                     color: 'success'
                 })
+                this.$router.push(`/products/showall`)
             } catch (err) {
+              console.error(err)
                 const errors = err?.response?.data?.errors
 
                 if (errors) {
