@@ -1,24 +1,36 @@
 <template>
-  <v-data-table :items="products" :custom-filter="filterName" :search="search" @click:row='onRowClick' :loading="loading">
+  <v-data-table :headers="headers" :items="products" :custom-filter="filterName" :search="search" :loading="loading">
     <template #top>
-      <v-text-field
-        v-model="search"
-        label="Search"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        hide-details
-        single-line
-      ></v-text-field>
+      <v-text-field v-model="search" label="Search" variant="outlined" hide-details single-line
+        prepend-inner-icon="mdi-magnify"></v-text-field>
     </template>
+    <template #item.actions="{ item }">
+      <v-btn icon size="small" color="primary" @click.stop="editItem(item)">
+        <v-icon icon="mdi-pencil" />
+      </v-btn>
+
+      <v-btn icon size="small" color="red" @click.stop="deleteItem(item)">
+        <v-icon icon="mdi-trash-can" />
+      </v-btn>
+    </template>
+
   </v-data-table>
 </template>
 
 <script>
 import api from "@/utils/axios";
+import { useSnackbarStore } from "@/utils/snackbar";
 
 export default {
   data() {
     return {
+      headers: [
+        { title: 'Id', key: 'id' },
+        { title: 'Name', key: 'name' },
+        { title: 'Quantity', key: 'quantity' },
+        { title: 'Price', key: 'price' },
+        { title: 'Actions', key: 'actions', sortable: false },
+      ],
       products: [],
       search: '',
       loading: false,
@@ -27,14 +39,35 @@ export default {
   mounted() {
     this.fetchItems();
   },
+  computed: {
+    snackbar() {
+      return useSnackbarStore()
+    }
+  },
   methods: {
-    onRowClick(event, row) {
-      console.log({...row})
-        this.$router.push(`/products/update/${row.item.id}`)
+    editItem(item) {
+      console.log({ ...item })
+      this.$router.push(`/products/update/${item.id}`)
+    },
+    async deleteItem(item) {
+      console.log({ item })
+      if (!confirm('Delete Product?')) return
+
+      try {
+        this.loading = true
+        const res = await api.delete(`/products/${item.id}`)
+        console.log(res)
+        this.snackbar.success('Product Deleted!')
+        await this.fetchItems()
+      } catch (err) {
+        console.error(err)
+      } finally {
+        this.loading = false
+      }
     },
     filterName(value, search, item) {
-        if (!search) return true
-        return item.columns.name.toLowerCase().includes(search.toLowerCase())
+      if (!search) return true
+      return item.columns.name.toLowerCase().includes(search.toLowerCase())
     },
     async fetchItems() {
       this.loading = true;

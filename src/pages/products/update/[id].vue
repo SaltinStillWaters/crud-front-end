@@ -1,10 +1,10 @@
 <template>
-  <v-container>
-    <v-snackbar-queue v-model="queue"></v-snackbar-queue>
-    <v-card class="pa-4" outlined>
+  <v-container fluid class="d-flex justify-center align-center">
+    <v-card class="pa-4" max-width="500" width="100%">
       <v-card-title>Update Product</v-card-title>
       <v-card-text>
-        <ProductForm :showDelete="true" @submit-form="updateProduct" @onDelete="deleteProduct" :data="form" :loading="loading" />
+        <ProductForm :showDelete="true" @submit-form="updateProduct" @onDelete="deleteProduct" :data="form"
+          :loading="loading" />
       </v-card-text>
     </v-card>
   </v-container>
@@ -13,8 +13,8 @@
 <script>
 import ProductForm from "@/components/ProductForm.vue";
 import api from "@/utils/axios";
+import { useSnackbarStore } from "@/utils/snackbar";
 import { defineComponent } from "vue";
-import { useRoute } from "vue-router";
 
 export default defineComponent({
   data: () => ({
@@ -24,16 +24,19 @@ export default defineComponent({
       price: null,
     },
     loading: false,
-    queue: [],
     productId: null,
   }),
   components: {
     ProductForm,
   },
   mounted() {
-  const route = useRoute()
-    this.productId = route.params.id
+    this.productId = this.$route.params.id
     this.fetchProduct()
+  },
+  computed: {
+    snackbar() {
+      return useSnackbarStore()
+    }
   },
   methods: {
     async fetchProduct() {
@@ -56,6 +59,7 @@ export default defineComponent({
         this.loading = true
         const res = await api.delete(`/products/${this.productId}`)
         console.log(res)
+        this.snackbar.success('Product deleted!')
         this.$router.push(`/products/showall`)
       } catch (err) {
         console.error(err)
@@ -67,33 +71,10 @@ export default defineComponent({
       try {
         this.loading = true
         const res = await api.patch(`/products/${this.productId}`, data)
-        this.fetchProduct()
-
-        this.queue = []
-        this.queue.push({
-          text: 'Updated Successfully!',
-          color: 'success'
-        })
+        this.snackbar.success('Product updated!')
         this.$router.push(`/products/showall`)
       } catch (err) {
-        const errors = err?.response?.data?.errors
-
-        if (errors) {
-          this.queue = []
-          Object.values(errors).forEach(error => {
-            error.forEach(err => {
-              this.queue.push({
-                text: err,
-                color: 'error'
-              })
-            })
-          })
-        } else {
-          this.queue.push({
-            text: 'Something went wrong',
-            color: 'error'
-          })
-        }
+        console.error({err})
       } finally {
         this.loading = false
       }

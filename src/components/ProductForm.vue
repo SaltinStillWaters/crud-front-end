@@ -1,29 +1,24 @@
 <template>
-  <v-card class="mx-auto" max-width="344" title="User Registration">
-    <v-form ref="formRef" @submit.prevent="submit">
-      <v-text-field v-model="form.name" :rules="rules.name" color="primary" label="Product Name"
-        variant="underlined"></v-text-field>
+  <v-form ref="formRef" @submit.prevent="submit" :loading="loading">
+    <v-text-field v-model="form.name" :rules="rules.name" label="Product Name" variant="underlined" />
+    <v-text-field v-model.number="form.quantity" :rules="rules.quantity" label="Quantity" variant="underlined" />
+    <v-text-field v-model.number="form.price" :rules="rules.price" label="Price" variant="underlined" />
 
-      <v-text-field v-model.number="form.quantity" :rules="rules.quantity" color="primary" label="Quantity"
-        variant="underlined"></v-text-field>
+    <v-divider class="my-4" />
 
-      <v-text-field v-model.number="form.price" :rules="rules.price" color="primary" label="Price"
-        variant="underlined"></v-text-field>
+    <v-card-actions>
+      <v-btn v-if="showDelete" color="red" @click="onDelete" :loading="loading">
+        <v-icon icon="mdi-trash-can" end />
+      </v-btn>
 
-      <v-divider></v-divider>
+      <v-spacer />
 
-      <v-card-actions>
-        <v-btn v-if='showDelete' type='button' @click="onDelete" :loading="loading" :disabled="loading" color="red">
-          <v-icon icon="mdi-trash-can" end></v-icon>
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-btn type='submit' :loading="loading" :disabled="loading" color="success">
-          Confirm
-          <v-icon icon="mdi-chevron-right" end></v-icon>
-        </v-btn>
-      </v-card-actions>
-    </v-form>
-  </v-card>
+      <v-btn type="submit" color="success" :loading="loading">
+        Confirm
+        <v-icon icon="mdi-chevron-right" end />
+      </v-btn>
+    </v-card-actions>
+  </v-form>
 </template>
 
 <script lang="ts">
