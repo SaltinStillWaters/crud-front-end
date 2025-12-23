@@ -10,12 +10,18 @@
 
         <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
           Password
-
-          <a class="text-caption text-decoration-none text-blue" href="#" rel="noopener noreferrer" target="_blank">
-            Forgot login password?</a>
         </div>
 
-        <v-text-field v-model="form.password" :rules="rules.password"
+        <v-text-field ref="confirmPasswordRef" v-model="form.password" :rules="rules.password"
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
+          density="compact" placeholder="Enter your password" prepend-inner-icon="mdi-lock-outline" variant="outlined"
+          @click:append-inner="visible = !visible"></v-text-field>
+
+        <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
+          Confirm Password
+        </div>
+
+        <v-text-field v-model="form.confirmPassword" :rules="rules.confirmPassword"
           :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
           density="compact" placeholder="Enter your password" prepend-inner-icon="mdi-lock-outline" variant="outlined"
           @click:append-inner="visible = !visible"></v-text-field>
@@ -27,14 +33,13 @@
         </v-card>
 
         <v-btn type="submit" class="mb-8" color="white" size="large" variant="tonal">
-          Log In
+          Sign up
         </v-btn>
 
         <v-card-text class="text-center">
-          <v-btn variant="text" color="primary" to="/auth/register" size="small">
-            Dont have an account? sign-up
-            <v-icon icon="mdi-chevron-right" />
-          </v-btn>
+          <a class="text-blue text-decoration-none" href="#" rel="noopener noreferrer" target="_blank">
+            Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
+          </a>
         </v-card-text>
       </v-form>
     </v-card>
@@ -42,23 +47,44 @@
 </template>
 <script lang="ts">
 import { api, web } from '@/utils/axios';
-import { isEmail, required } from '@/utils/rules';
-import type { VForm } from 'vuetify/components';
+import { isEmail, isStrongPassword, matches, required } from '@/utils/rules';
+import type { VForm, VTextField } from 'vuetify/components';
 import Cookies from 'js-cookie';
+import { nextTick } from 'vue';
+
+type Rule = (v: any) => boolean | string
 
 export default {
   data: () => ({
     loading: false,
     rules: {
       email: [required(), isEmail()],
-      password: [required()]
+      password: [required(), isStrongPassword()],
+      confirmPassword: [] as Rule[]
     },
     form: {
       email: '',
-      password: ''
+      password: '',
+      confirmPassword: ''
     },
     visible: false,
   }),
+  created() {
+    this.rules.confirmPassword = [
+      required(),
+      matches(() => this.form.password)
+    ]
+  },
+  watch: {
+    'form.password'() {
+      const temp = this.form.confirmPassword
+      this.form.confirmPassword = ''
+
+      nextTick(() => {
+        this.form.confirmPassword = temp
+      })
+    }
+  },
   methods: {
     async submit() {
       try {

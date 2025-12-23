@@ -11,6 +11,19 @@ export const isEmail = () =>
       return emailRegex.test(v) || 'Must be an email'
     }
 
+export const isStrongPassword = () =>
+    (v: string) => {
+      //from OWASP https://owasp.org/www-community/OWASP_Validation_Regex_Repository
+      const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,8}$/;
+      return passwordRegex.test(v) || 'Password too weak'
+    }
+
+export const matches = (getValue: () => string) =>
+  (v: string) => {
+    console.log(v, getValue())
+    return v === getValue() || 'Does not match'
+  }
+
 export const isNumber = () =>
     (v: any) => v === null || v === '' || !isNaN(Number(v)) || 'Must be a number'
 
