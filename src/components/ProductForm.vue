@@ -8,7 +8,7 @@
 
     <v-card-actions>
       <v-btn v-if="showDelete" color="red" @click="onDelete" :loading="loading">
-        <v-icon icon="mdi-trash-can" end />
+        <v-icon icon="mdi-trash-can" />
       </v-btn>
 
       <v-spacer />

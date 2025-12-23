@@ -1,20 +1,21 @@
 <template>
-  <v-data-table :headers="headers" :items="products" :custom-filter="filterName" :search="search" :loading="loading">
+  <v-data-table :columns="columns" :items="products" :custom-filter="filterName" :search="search" :loading="loading">
     <template #top>
       <v-text-field v-model="search" label="Search" variant="outlined" hide-details single-line
         prepend-inner-icon="mdi-magnify"></v-text-field>
     </template>
     <template #item.actions="{ item }">
-      <v-btn icon size="small" color="primary" @click.stop="editItem(item)">
-        <v-icon icon="mdi-pencil" />
-      </v-btn>
+        <v-btn icon size="small" color="white" variant="tonal" @click.stop="editItem(item)">
+          <v-icon icon="mdi-pencil" />
+        </v-btn>
 
-      <v-btn icon size="small" color="red" @click.stop="deleteItem(item)">
-        <v-icon icon="mdi-trash-can" />
-      </v-btn>
-    </template>
+        <v-divider vertical class="mx-1" />
 
-  </v-data-table>
+        <v-btn icon size="small" color="red" variant="tonal" @click.stop="deleteItem(item)">
+          <v-icon icon="mdi-trash-can" />
+        </v-btn>
+      </template>
+    </v-data-table>
 </template>
 
 <script>
@@ -24,7 +25,7 @@ import { useSnackbarStore } from "@/utils/snackbar";
 export default {
   data() {
     return {
-      headers: [
+      columns: [
         { title: 'Id', key: 'id' },
         { title: 'Name', key: 'name' },
         { title: 'Quantity', key: 'quantity' },
