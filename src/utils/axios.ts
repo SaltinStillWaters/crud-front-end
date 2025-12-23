@@ -1,19 +1,37 @@
 import axios from "axios";
 import { useSnackbarStore } from "./snackbar";
+import Cookies from "js-cookie";
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: "http://localhost:8000/api",
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json",
   },
+  withCredentials: true,
 });
+
+export const web = axios.create({
+  baseURL: "http://localhost:8000",
+  headers: {
+    Accept: "application/json",
+  }
+});
+
+api.interceptors.request.use(config => {
+  const token = Cookies.get('XSRF-TOKEN')
+
+  if (token) {
+    config.headers['X-CSRF-TOKEN'] = decodeURIComponent(token)
+  }
+
+  return config
+})
 
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    console.log('FROM AXIOS')
-    console.error({err})
+    console.log("FROM AXIOS");
+    console.error({ err });
     const snackbar = useSnackbarStore();
 
     if (!err.response) {
@@ -51,5 +69,3 @@ api.interceptors.response.use(
     return Promise.reject(err);
   }
 );
-
-export default api;
