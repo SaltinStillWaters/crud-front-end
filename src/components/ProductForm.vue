@@ -13,6 +13,9 @@
 
       <v-spacer />
 
+      <v-btn @click="onCancel" color="tonal" :loading="loading">
+        Cancel
+      </v-btn>
       <v-btn type="submit" color="success" :loading="loading">
         Confirm
         <v-icon icon="mdi-chevron-right" end />
@@ -78,10 +81,13 @@ export default defineComponent({
 
       this.$emit('submit-form', this.form);
     },
-
     onDelete() {
       console.log('deleting')
       this.$emit('onDelete')
+    },
+    onCancel() {
+      console.log('canceling')
+      this.$emit('onCancel')
     }
   }
 });

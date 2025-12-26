@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useSnackbarStore } from "./snackbar";
 import Cookies from "js-cookie";
+import router from "@/router";
 
 export const api = axios.create({
   baseURL: "http://localhost:8000/api",
@@ -39,16 +40,22 @@ api.interceptors.response.use(
       return Promise.reject(err);
     }
 
+    if (err.config?.meta?.silent) {
+      return Promise.reject(err);
+    }
+
     const { status, data } = err.response;
 
     switch (status) {
       case 401:
-        snackbar.error("Unauthorized. Please log in");
+        snackbar.error("Please log in to continue");
+        router.push('/auth/Login');
         break;
 
       case 403:
         snackbar.error("You do not have permission to perform this action");
-        break;
+        router.push('/products/ShowAll');
+      break;
 
       case 404:
         snackbar.error("Resource not found");

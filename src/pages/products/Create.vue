@@ -3,7 +3,7 @@
     <v-card class="pa-4" max-width="500" width="100%">
       <v-card-title>Create Product</v-card-title>
       <v-card-text>
-        <ProductForm @submit-form="createProduct" :loading="loading" />
+        <ProductForm @submit-form="createProduct" @onCancel="cancel" :loading="loading" />
       </v-card-text>
     </v-card>
   </v-container>
@@ -22,24 +22,25 @@ export default {
   components: {
     ProductForm,
   },
-  computed: {
-    snackbar() {
-      return useSnackbarStore();
-    }
-  },
   methods: {
     async createProduct(data) {
+      this.loading = true
       try {
-        this.loading = true
+        const snackbar = useSnackbarStore()
         await api.post('/products', data);
 
-        this.snackbar.success('Product Added!')
+        snackbar.success('Product Added!')
         this.$router.push(`/products/showall`)
       } catch (err) {
         console.log(err)
       } finally {
         this.loading = false
       }
+    },
+
+    async cancel() {
+      this.loading = true
+      await this.$router.push('/products/ShowAll')
     }
   }
 }

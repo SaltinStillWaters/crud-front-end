@@ -5,6 +5,7 @@
  */
 
 // Composables
+import { fetchUser, loading, user } from '@/utils/auth'
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 
@@ -25,6 +26,32 @@ router.onError((err, to) => {
     }
   } else {
     console.error(err)
+  }
+})
+
+router.getRoutes().forEach(route => {
+  const path = route.path
+
+  if (path.startsWith('/products')) {
+    route.meta.requiresAuth = true
+  } else if (path.startsWith('/auth')) {
+    route.meta.guestOnly = true
+  }
+})
+
+router.beforeEach(async (to) => {
+  console.log({to, user, loading})
+
+  if (!loading.value) {
+    await fetchUser()
+  }
+
+  if (to.meta.requiresAuth && !user.value) {
+    return '/auth/login'
+  }
+
+  if (to.meta.guestOnly && user.value) {
+    return '/products/showall'
   }
 })
 

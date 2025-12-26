@@ -5,24 +5,28 @@
         prepend-inner-icon="mdi-magnify"></v-text-field>
     </template>
     <template #item.actions="{ item }">
-        <v-btn icon size="small" color="white" variant="tonal" @click.stop="editItem(item)">
-          <v-icon icon="mdi-pencil" />
-        </v-btn>
+      <v-btn icon size="small" color="white" variant="tonal" @click.stop="editItem(item)">
+        <v-icon icon="mdi-pencil" />
+      </v-btn>
 
-        <v-divider vertical class="mx-1" />
+      <v-divider vertical class="mx-1" />
 
-        <v-btn icon size="small" color="red" variant="tonal" @click.stop="deleteItem(item)">
-          <v-icon icon="mdi-trash-can" />
-        </v-btn>
-      </template>
-    </v-data-table>
+      <v-btn icon size="small" color="red" variant="tonal" @click.stop="deleteItem(item)">
+        <v-icon icon="mdi-trash-can" />
+      </v-btn>
+    </template>
+  </v-data-table>
 </template>
 
 <script>
 import { api } from "@/utils/axios";
 import { useSnackbarStore } from "@/utils/snackbar";
+import { VDataTable } from "vuetify/components";
 
 export default {
+  components: {
+    VDataTable,
+  },
   data() {
     return {
       columns: [
@@ -30,7 +34,7 @@ export default {
         { title: 'Name', key: 'name' },
         { title: 'Quantity', key: 'quantity' },
         { title: 'Price', key: 'price' },
-        { title: 'Actions', key: 'actions', sortable: false },
+        { title: 'Actions', key: 'actions', sortable: false},
       ],
       products: [],
       search: '',
@@ -48,6 +52,7 @@ export default {
   methods: {
     editItem(item) {
       console.log({ ...item })
+      this.loading = true
       this.$router.push(`/products/update/${item.id}`)
     },
     async deleteItem(item) {
@@ -74,7 +79,11 @@ export default {
       this.loading = true;
       try {
         const res = await api.get('/products');
-        this.products = res.data;
+        this.products = res.data.map(p => ({
+          ...p,
+          actions: null
+        }))
+
       } catch (err) {
         console.error(err);
       } finally {
