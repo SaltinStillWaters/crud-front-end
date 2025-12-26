@@ -14,7 +14,7 @@ export const isEmail = () =>
 export const isStrongPassword = () =>
     (v: string) => {
       //from OWASP https://owasp.org/www-community/OWASP_Validation_Regex_Repository
-      const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,8}$/;
+      const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,55}$/;
       return passwordRegex.test(v) || 'Password too weak'
     }
 

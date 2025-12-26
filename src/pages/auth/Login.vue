@@ -26,13 +26,13 @@
           </v-card-text>
         </v-card>
 
-        <v-btn type="submit" class="mb-8" color="white" size="large" variant="tonal">
+        <v-btn type="submit" class="mb-8" color="white" size="large" variant="tonal" :loading="loading">
           Log In
         </v-btn>
 
         <v-card-text class="text-center">
           <v-btn variant="text" color="primary" to="/auth/register" size="small">
-            Dont have an account? sign-up
+            Don't have an account?
             <v-icon icon="mdi-chevron-right" />
           </v-btn>
         </v-card-text>
@@ -45,6 +45,7 @@ import { api, web } from '@/utils/axios';
 import { isEmail, required } from '@/utils/rules';
 import type { VForm } from 'vuetify/components';
 import Cookies from 'js-cookie';
+import { useSnackbarStore } from '@/utils/snackbar';
 
 export default {
   data: () => ({
@@ -59,9 +60,15 @@ export default {
     },
     visible: false,
   }),
+  computed: {
+    snackbar() {
+      return useSnackbarStore()
+    }
+  },
   methods: {
     async submit() {
       try {
+        this.loading = true
         const form = this.$refs.formRef as VForm | undefined;
         if (!form) return
 
@@ -73,9 +80,13 @@ export default {
         const token = Cookies.get('XSRF-TOKEN')
         if (!token) return
 
-        await api.post('/login', this.form)
+        await api.post('/auth/login', this.form)
+        this.snackbar.success('Logged in successfully!')
+        this.$router.push(`/products/showall`)
       } catch (err) {
         console.error(err)
+      } finally {
+        this.loading = false
       }
     }
   }

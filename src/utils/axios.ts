@@ -63,7 +63,7 @@ api.interceptors.response.use(
         break;
 
       default:
-        snackbar.error(data.message ?? "Invalid input");
+        snackbar.error("Something went wrong");
     }
 
     return Promise.reject(err);

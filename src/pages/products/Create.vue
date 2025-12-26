@@ -11,7 +11,7 @@
 
 <script>
 import ProductForm from '@/components/ProductForm.vue';
-import api from '@/utils/axios';
+import { api } from '@/utils/axios';
 import { useSnackbarStore } from '@/utils/snackbar';
 
 export default {

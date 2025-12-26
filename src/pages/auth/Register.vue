@@ -2,6 +2,12 @@
   <v-container fluid class="d-flex justify-center align-center">
     <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
       <v-form ref="formRef" @submit.prevent="submit" :loading="loading">
+        <div class="text-subtitle-1 text-medium-emphasis">Username</div>
+
+        <v-text-field v-model="form.name" :rules="rules.name" density="compact" placeholder="Name"
+          prepend-inner-icon="mdi-email-outline" variant="outlined">
+        </v-text-field>
+
         <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
         <v-text-field v-model="form.email" :rules="rules.email" density="compact" placeholder="Email address"
@@ -32,14 +38,14 @@
           </v-card-text>
         </v-card>
 
-        <v-btn type="submit" class="mb-8" color="white" size="large" variant="tonal">
+        <v-btn type="submit" class="mb-8" color="white" size="large" variant="tonal" :loading="loading">
           Sign up
         </v-btn>
 
         <v-card-text class="text-center">
-          <a class="text-blue text-decoration-none" href="#" rel="noopener noreferrer" target="_blank">
-            Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
-          </a>
+          <v-btn variant="text" color="primary" to="/auth/login" size="small">
+            Already have an account? <v-icon icon="mdi-chevron-right"></v-icon>
+          </v-btn>
         </v-card-text>
       </v-form>
     </v-card>
@@ -51,6 +57,7 @@ import { isEmail, isStrongPassword, matches, required } from '@/utils/rules';
 import type { VForm, VTextField } from 'vuetify/components';
 import Cookies from 'js-cookie';
 import { nextTick } from 'vue';
+import { useSnackbarStore } from '@/utils/snackbar';
 
 type Rule = (v: any) => boolean | string
 
@@ -58,11 +65,13 @@ export default {
   data: () => ({
     loading: false,
     rules: {
+      name: [required()],
       email: [required(), isEmail()],
       password: [required(), isStrongPassword()],
       confirmPassword: [] as Rule[]
     },
     form: {
+      name: '',
       email: '',
       password: '',
       confirmPassword: ''
@@ -74,6 +83,11 @@ export default {
       required(),
       matches(() => this.form.password)
     ]
+  },
+  computed: {
+    snackbar() {
+      return useSnackbarStore()
+    }
   },
   watch: {
     'form.password'() {
@@ -88,6 +102,7 @@ export default {
   methods: {
     async submit() {
       try {
+        this.loading = true
         const form = this.$refs.formRef as VForm | undefined;
         if (!form) return
 
@@ -99,9 +114,13 @@ export default {
         const token = Cookies.get('XSRF-TOKEN')
         if (!token) return
 
-        await api.post('/login', this.form)
+        await api.post('/auth/register', this.form)
+        this.snackbar.success('Registered successfully!')
+        this.$router.push(`/products/showall`)
       } catch (err) {
         console.error(err)
+      } finally {
+        this.loading = false
       }
     }
   }
