@@ -5,7 +5,6 @@
  */
 
 // Composables
-import { fetchUser, loading, user } from '@/utils/auth'
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 
@@ -18,9 +17,9 @@ const router = createRouter({
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
     if (localStorage.getItem('vuetify:dynamic-reload')) {
-      console.error('Dynamic import error, reloading page did not fix it', err)
+      console.error('Dynamic import error, refetched page did not fix it', err)
     } else {
-      console.log('Reloading page to fix dynamic import error')
+      console.log('Refetched page to fix dynamic import error')
       localStorage.setItem('vuetify:dynamic-reload', 'true')
       location.assign(to.fullPath)
     }
@@ -36,22 +35,6 @@ router.getRoutes().forEach(route => {
     route.meta.requiresAuth = true
   } else if (path.startsWith('/auth')) {
     route.meta.guestOnly = true
-  }
-})
-
-router.beforeEach(async (to) => {
-  console.log({to, user, loading})
-
-  if (!loading.value) {
-    await fetchUser()
-  }
-
-  if (to.meta.requiresAuth && !user.value) {
-    return '/auth/login'
-  }
-
-  if (to.meta.guestOnly && user.value) {
-    return '/products/showall'
   }
 })
 

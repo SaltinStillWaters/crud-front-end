@@ -7,7 +7,7 @@
     <v-app-bar-title>Inventory Management System</v-app-bar-title>
 
     <template #append v-if="user">
-      <v-btn icon @click="logout" title="Logout">
+      <v-btn icon @click="logout" title="Logout" :loading="loading">
         <v-icon>mdi-logout</v-icon>
       </v-btn>
     </template>
@@ -25,6 +25,7 @@ export default {
   }),
   computed: {
     user() {
+      console.log(user.value)
       return user.value
     }
   },

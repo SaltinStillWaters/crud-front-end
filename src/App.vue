@@ -1,7 +1,9 @@
 <template>
   <v-app>
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout" location="top">
-      {{  snackbar.text  }}
+      <div default class="text-center">
+        {{  snackbar.text  }}
+      </div>
     </v-snackbar>
     <v-layout>
       <AppHeader />
